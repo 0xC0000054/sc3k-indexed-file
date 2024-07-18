@@ -1,0 +1,57 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+end_of_line = crlf
+
+vsspell_section_id = 30a86b75973f41d3b6fe30b8f7950859
+vsspell_ignored_words_30a86b75973f41d3b6fe30b8f7950859 = File:IgnoredWords.dic
+
+[*.cs]
+indent_style                                          = space
+indent_size                                           = 4
+trim_trailing_whitespace                              = true
+insert_final_newline                                  = true
+
+# Newline settings
+csharp_new_line_before_open_brace                     = all
+csharp_new_line_before_else                           = true
+csharp_new_line_before_catch                          = true
+csharp_new_line_before_finally                        = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types     = true
+csharp_new_line_between_query_expression_clauses      = true
+
+# Expression-bodied member settings
+csharp_style_expression_bodied_methods                = false : none
+csharp_style_expression_bodied_constructors           = false : none
+csharp_style_expression_bodied_operators              = false : none
+csharp_style_expression_bodied_properties             = false : none
+csharp_style_expression_bodied_indexers               = false : none
+csharp_style_expression_bodied_accessors              = false : none
+
+# Code style defaults
+csharp_style_implicit_object_creation_when_type_is_apparent = false
+
+# Code block settings
+csharp_prefer_braces                                  = true : warning
+
+# "This." qualifier settings
+dotnet_style_qualification_for_field                  = true : suggestion
+dotnet_style_qualification_for_property               = true : suggestion
+dotnet_style_qualification_for_method                 = false : suggestion
+dotnet_style_qualification_for_event                  = true : suggestion
+
+# IDE0057: Use range operator
+csharp_style_prefer_range_operator = false
+
+# IDE0066: Convert switch statement to expression
+csharp_style_prefer_switch_expression = false
+
+# IDE0230: Use UTF-8 string literal
+csharp_style_prefer_utf8_string_literals = true
+
+# IDE0290: Use primary constructor
+csharp_style_prefer_primary_constructors = false
