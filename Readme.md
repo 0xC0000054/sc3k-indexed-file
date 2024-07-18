@@ -44,6 +44,14 @@ Listing the entries in a single file: `SC3KIxf -l BUILDFAM.ixf`
 Listing the entries in multiple IXF files can be accomplished by passing a root directory to be searched instead
 of an individual file path: `SC3KIxf -l <SC3K root>`  
 
+#### Printing the number of IXF Entries
+
+This can be done by running the program without any command line switches. The entries will be printed to standard output.
+
+Printing the number of entries in a single file: `SC3KIxf BUILDFAM.ixf`
+Printing the number of entries in multiple IXF files can be accomplished by passing a root directory
+to be searched instead of an individual file path: `SC3KIxf <SC3K root>`
+
 # License
 
 This project is licensed under the terms of the MIT License.    
