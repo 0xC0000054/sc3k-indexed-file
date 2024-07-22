@@ -39,8 +39,6 @@ namespace SC3KIxf
 
         public IReadOnlyList<IndexEntry> Entries => this.entries;
 
-        private static ReadOnlySpan<byte> CompressedDataSignature => [0x07, 0x01, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00];
-
         public void WriteEntriesToOutputDirectory(string outputDirectory)
         {
             Directory.CreateDirectory(outputDirectory);
@@ -62,31 +60,8 @@ namespace SC3KIxf
                                                     entry.Instance,
                                                     ResourceExtraction.GetFileExtension((ResourceType)entry.Type));
 
-                    // The compressed entries in a DAT/IXF file use a 20 byte header before the start of
-                    // the compressed data.
-                    // The header appears to consist of 5 4-byte little endian integers, the first and second values
-                    // are always the same while the third, fourth and fifth values change from entry to entry.
-                    //
-                    // The actual compressed data follows this header in the QFS/RefPack format.
-                    if (bytes.Length > 20 && bytes.StartsWith(CompressedDataSignature))
-                    {
-                        ReadOnlySpan<byte> compressedData = bytes.Slice(20);
 
-                        int uncompressedLength = QfsCompression.GetDecompressedSize(compressedData);
-
-                        using (SpanOwner<byte> uncompressedOwner = SpanOwner<byte>.Allocate(uncompressedLength))
-                        {
-                            Span<byte> uncompressedData = uncompressedOwner.Span;
-
-                            QfsCompression.Decompress(compressedData, uncompressedData);
-
-                            WriteFileData(Path.Combine(outputDirectory, fileName), entry.Type, uncompressedData);
-                        }
-                    }
-                    else
-                    {
-                        WriteFileData(Path.Combine(outputDirectory, fileName), entry.Type, bytes);
-                    }
+                    WriteFileData(Path.Combine(outputDirectory, fileName), (ResourceType)entry.Type, bytes);
                 }
             }
         }
@@ -140,25 +115,51 @@ namespace SC3KIxf
             return list;
         }
 
-        private static void WriteFileData(string path, uint type, ReadOnlySpan<byte> data)
+        private static void WriteFileData(string path, ResourceType type, ReadOnlySpan<byte> data)
         {
-            ReadOnlySpan<byte> bytes = data;
-
-            switch ((ResourceType)type)
+            if (type == ResourceType.SpriteImage)
             {
-                case ResourceType.String:
-                    bytes = ResourceExtraction.GetStringData(data);
-                    break;
+                WriteSpriteImageData(path, data);
             }
+            else
+            {
+                ReadOnlySpan<byte> bytes = data;
 
+                switch (type)
+                {
+                    case ResourceType.String:
+                        bytes = ResourceExtraction.GetStringData(data);
+                        break;
+                }
+
+                WriteFileData(path, bytes);
+            }
+        }
+
+        private static void WriteFileData(string path, ReadOnlySpan<byte> data)
+        {
             using (SafeFileHandle handle = File.OpenHandle(path,
                                                            FileMode.Create,
                                                            FileAccess.Write,
                                                            FileShare.None,
                                                            FileOptions.None,
-                                                           bytes.Length))
+                                                           data.Length))
             {
-                RandomAccess.Write(handle, bytes, 0);
+                RandomAccess.Write(handle, data, 0);
+            }
+        }
+
+        private static void WriteSpriteImageData(string path, ReadOnlySpan<byte> data)
+        {
+            MemoryOwner<byte>? decompressedSpriteImage = ResourceExtraction.TryDecompressSpriteImage(data);
+
+            if (decompressedSpriteImage != null)
+            {
+                WriteFileData(path, decompressedSpriteImage.Span);
+            }
+            else
+            {
+                WriteFileData(path, data);
             }
         }
 

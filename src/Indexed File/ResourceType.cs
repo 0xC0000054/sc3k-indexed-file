@@ -26,6 +26,8 @@ namespace SC3KIxf
         SerialText = 0x81F53D09, // TXT!
         SpriteAttributes = 0x6300,
         SpriteAnimationAttributes = 0x6301,
+        SpriteImage  = 0,
+        SpriteImageInfo = 1,
         String = 0x2026960b,
     }
 }
